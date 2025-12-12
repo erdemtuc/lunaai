@@ -7,6 +7,7 @@ export async function getCompanies() {
     },
     include: {
       company_news: true,
+      user:true
     },
   });
 

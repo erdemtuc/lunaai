@@ -7,13 +7,14 @@ import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import CompanyDetail from "./CompanyDetail";
+import { CompanyArrayType } from "@/lib/types/news-types";
 
 interface CompaniesProps {
-  initialCompanies: Company[];
+  initialCompanies: CompanyArrayType;
 }
 
 export default function Companies({ initialCompanies }: CompaniesProps) {
-  const [companies, setCompanies] = useState<Company[]>(initialCompanies);
+  const [companies, setCompanies] = useState(initialCompanies.companies);
   const [sidebarWidth, setSidebarWidth] = useState(500);
   const [isResizing, setIsResizing] = useState(false);
   const [showListMenu, setShowListMenu] = useState(false);

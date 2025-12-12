@@ -14,7 +14,7 @@ import { useEffect, useState } from "react";
 import { CompanyNewsItem } from "@/lib/types/news-types";
 import { formatDate } from "@/lib/utils";
 
-const CompanyDetail = ({ activeCompany }: { activeCompany: Company }) => {
+const CompanyDetail = ({ activeCompany }: { activeCompany: any }) => {
   const [loadinNewses, setLoadinNewses] = useState(false);
   const [newses, setNewses] = useState<CompanyNewsItem[]>([]);
 
@@ -53,7 +53,7 @@ const CompanyDetail = ({ activeCompany }: { activeCompany: Company }) => {
                 {activeCompany.name}
               </h1>
               <div className="flex items-center gap-3 text-sm font-medium text-subtitle-dark">
-                <span>October 17, 2025</span>
+                <span>{formatDate(activeCompany.created_date)}</span>
                 <span className="w-1.5 h-1.5 rounded-full bg-neutral-300"></span>
                 <div className="flex items-center gap-1.5">
                   <Image
@@ -63,7 +63,7 @@ const CompanyDetail = ({ activeCompany }: { activeCompany: Company }) => {
                     height={16}
                     className="rounded-full"
                   />
-                  <span>Leslie Alexander</span>
+                  <span>{activeCompany?.user?.name}</span>
                 </div>
               </div>
             </div>
