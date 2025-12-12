@@ -25,7 +25,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-white">
-      <header className="h-16 border-b border-neutral-200 flex items-center justify-between px-6 shrink-0 z-50 bg-white">
+      <header className="h-16 border-b-2 border-border-dark flex items-center justify-between px-6 shrink-0 z-50 bg-white">
         <div className="flex items-center gap-10">
           {/* logo */}
           <div className="flex items-center">
@@ -39,7 +39,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </div>
 
           {/* navigation */}
-          <nav className="flex items-center gap-8 text-sm font-medium text-neutral-500">
+          <nav className="flex items-center gap-8 text-sm font-semibold text-subtitle-dark">
             <a href="/" className="hover:text-blue-600 transition-colors">
               Dashboard
             </a>
@@ -63,7 +63,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 currentPath.startsWith("/companies") && "text-blue-600"
               )}
             >
-              Companies
+              Leads
             </Link>
           </nav>
         </div>
@@ -77,7 +77,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <input
               type="text"
               placeholder="Search for anything..."
-              className="pl-9 pr-4 py-1.5 w-72 border border-neutral-200 rounded-lg text-xs text-subtitle-dark bg-white placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-all shadow-xs"
+              className="pl-9 pr-4 py-2 w-72 border border-searchbox rounded-lg text-xs text-subtitle-dark bg-white placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-all"
             />
           </div>
 

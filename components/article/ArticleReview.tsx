@@ -10,10 +10,9 @@ import {
   CirclePlus,
   Globe,
   HelpCircle,
-  Plus,
-  Rows2,
-  StickyNote,
+  Plus
 } from "lucide-react";
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "../ui/button";
 import FeedBackModal from "./FeedBackModal";
@@ -100,18 +99,26 @@ export default function ArticleReview({ articles }: ArticleReviewProps) {
   return (
     <div className="flex flex-col h-full bg-white">
       {/* toolbar */}
-      <div className="h-11 border-b border-neutral-200 bg-white flex items-center justify-between px-6 shrink-0 z-20">
-        <div className="relative">
+      <div className="h-11 border-b-2 border-border-dark bg-white flex items-center justify-between pl-6 shrink-0 z-20">
+        <div className="relative w-[256px] border-r-2 border-border-dark h-full flex items-center">
           <button
             onClick={() => setShowClassifyMenu(!showClassifyMenu)}
-            className="flex items-center gap-4 font-semibold text-subtitle-dark text-xs hover:bg-neutral-50 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+            className="flex items-center gap-4 font-semibold text-subtitle-dark text-xs hover:bg-neutral-50 px-3 py-1.5 rounded-lg transition-colors cursor-pointer w-full justify-between"
           >
             <div className="flex items-center gap-2">
-              <Rows2 size={16} />
+              {/* <Rows2 size={16} /> */}
+              <Image
+                src="/icons/classify.svg"
+                alt="Luna logo"
+                width={13}
+                height={11}
+                className="flex items-center p-0 m-0 "
+              />
               <span>{classifyStatus}</span>
             </div>
             <ChevronDown
-              className={`w-5 h-5 text-subtitle-dark transition-transform ${
+              size={16}
+              className={` text-icon-dark transition-transform mr-2 ${
                 showClassifyMenu ? "rotate-180" : ""
               }`}
             />
@@ -150,7 +157,7 @@ export default function ArticleReview({ articles }: ArticleReviewProps) {
             <Button
               variant="outline"
               size="sm"
-              className="flex gap-2 items-center cursor-pointer"
+              className="flex gap-2 items-center cursor-pointer rounded-lg h-7"
             >
               <Globe size={14} className="text-subtitle-dark/80" />
               <span className="text-xs text-subtitle-dark font-semibold">
@@ -159,18 +166,16 @@ export default function ArticleReview({ articles }: ArticleReviewProps) {
             </Button>
             <Button
               size="sm"
-              className="flex gap-2 items-center cursor-pointer"
+              className="flex gap-2 items-center cursor-pointer rounded-lg h-7"
             >
               <Plus size={14} className="" />
               <span className="text-xs font-semibold">Add Lead</span>
             </Button>
           </div>
 
-          <div className="h-11 w-px bg-neutral-200"></div>
-
-          <div className="flex items-center">
-            <div className="flex items-center gap-2">
-              <div className="w-24 h-1.5 bg-neutral-300 rounded-full overflow-hidden">
+          <div className="flex items-center border-l-2 border-border-dark">
+            <div className="flex items-center gap-2 px-2">
+              <div className="w-16 mx-1 h-1.5 bg-neutral-300 rounded-full overflow-hidden">
                 <div className="w-[30%] h-full bg-blue-600 rounded-full"></div>
               </div>
               <div className="flex items-center text-xs font-semibold tracking-wide">
@@ -178,14 +183,14 @@ export default function ArticleReview({ articles }: ArticleReviewProps) {
                 <span className="text-neutral-900/40">/50</span>
               </div>
             </div>
-            <div className="h-11 w-px bg-neutral-200 mx-[7.5px]"></div>
-            <div className="flex items-center gap-1.5 text-subtitle-dark text-xs font-semibold">
+            <div className="h-11 w-[1.5px] bg-neutral-200 mx-[7.5px]"></div>
+            <div className="flex items-center text-subtitle-dark text-xs font-semibold px-1">
               <Button variant="ghost" size="sm" className="cursor-pointer">
-                <CircleMinus size={16} />
+                <CircleMinus size={14} />
               </Button>
               <span>100%</span>
               <Button variant="ghost" size="sm" className="cursor-pointer">
-                <CirclePlus size={16} />
+                <CirclePlus size={14} />
               </Button>
             </div>
           </div>
@@ -194,39 +199,42 @@ export default function ArticleReview({ articles }: ArticleReviewProps) {
 
       <div className="flex-1 flex overflow-hidden">
         {/* article list */}
-        <aside className="w-[320px] border-r border-neutral-200 bg-white flex flex-col shrink-0">
+        <aside className="w-[280px] border-r-2 border-border-dark bg-white flex flex-col shrink-0">
           <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-custom">
             {articles.map((article, idx) => (
               <div
                 key={article.id}
-                onClick={() => setActiveArticleId(article.id)}
-                className={`
-                  p-4 rounded-xl border-3 cursor-pointer transition-all duration-200 hover:shadow-md relative group
+                className="flex flex-col items-center gap-2"
+              >
+                <div
+                  onClick={() => setActiveArticleId(article.id)}
+                  className={`
+                  p-4 rounded-xl border-3 cursor-pointer transition-all duration-200 hover:shadow-sm relative group
                   ${
                     article.id === activeArticleId
                       ? "border-green-600/50 bg-white"
-                      : "border-transparent bg-white hover:border-neutral-100 shadow-sm ring-1 ring-neutral-100"
+                      : "border-neutral-200 bg-white hover:border-neutral-300 shadow-xs"
                   }
                 `}
-              >
-                <div className="absolute -left-2 -top-2 w-5 h-5 rounded-full bg-white border border-neutral-200 shadow-sm flex items-center justify-center text-[10px] font-bold text-neutral-600">
-                  {idx + 1}
-                </div>
+                >
+                  <h3 className="font-bold text-sm mb-2 leading-tight text-neutral-900">
+                    {article.header}
+                  </h3>
+                  <p className="text-xs text-neutral-500 line-clamp-3 leading-relaxed">
+                    {article.content}
+                  </p>
 
-                <h3 className="font-bold text-sm mb-2 leading-tight text-neutral-900">
-                  {article.header}
-                </h3>
-                <p className="text-xs text-neutral-500 line-clamp-3 leading-relaxed">
-                  {article.content}
-                </p>
-
-                {article.id !== activeArticleId && (
+                  {/* {article.id !== activeArticleId && (
                   <div className="mt-3 flex justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                     <span className="text-[10px] font-medium text-neutral-400 uppercase tracking-wider">
                       Click to review
                     </span>
                   </div>
-                )}
+                )} */}
+                </div>
+                <div className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-medium text-neutral-900">
+                  {idx + 1}
+                </div>
               </div>
             ))}
           </div>
@@ -235,11 +243,11 @@ export default function ArticleReview({ articles }: ArticleReviewProps) {
         {/* article content */}
         <section
           ref={scrollContainerRef}
-          className="flex-1 bg-neutral-50/50 overflow-y-auto relative flex justify-center scroll-smooth scrollbar-custom"
+          className="flex-1 bg-bg-main overflow-y-auto relative flex justify-center scroll-smooth scrollbar-custom"
         >
-          <div className="my-8 rounded-lg border-6 border-green-600/50 shadow-sm h-fit">
-            <div className="w-3xl bg-white min-h-full p-12 shadow-sm relative border-x rounded-md outine-1 outline-brand-green">
-              <div className="text-red-600 font-bold text-xs tracking-wider uppercase bg-red-50 px-2 py-1 mb-2 rounded w-fit ml-auto">
+          <div className="my-8 rounded-3xl border-6 border-green-600/50 shadow-sm h-fit">
+            <div className="w-4xl bg-white min-h-full p-12 shadow-sm relative border-x rounded-[18px] border border-brand-green">
+              <div className="text-title-red font-bold text-sm tracking-wider uppercase px-2 py-1 mb-2 rounded w-fit ml-auto">
                 {activeArticle.company_news[0].company?.name ||
                   "Unknown Company"}
               </div>
@@ -248,15 +256,15 @@ export default function ArticleReview({ articles }: ArticleReviewProps) {
                 <h1 className="text-xl font-bold text-title-dark mb-4 leading-tight">
                   {activeArticle.header}
                 </h1>
-                <div className="flex items-center flex-wrap gap-x-4 gap-y-2 text-sm text-neutral-500">
+                <div className="flex items-center flex-wrap gap-x-2 gap-y-2 text-sm text-neutral-500">
                   <span className="font-bold text-subtitle-dark text-sm">
                     {activeArticle.news_source?.name ?? "Unknown Source"}
                   </span>
-                  <span className="w-1.5 h-1.5 rounded-full bg-neutral-200"></span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-neutral-300"></span>
                   <span className="text-subtitle-dark font-medium text-sm">
                     {activeArticle.author}
                   </span>
-                  <span className="w-1.5 h-1.5 rounded-full bg-neutral-200 "></span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-neutral-300 "></span>
                   <span className="text-subtitle-dark font-medium text-sm">
                     {formatDate(activeArticle.published_date)}
                   </span>
@@ -265,7 +273,7 @@ export default function ArticleReview({ articles }: ArticleReviewProps) {
 
               <div ref={contentRef}>
                 <div
-                  className="prose prose-sm max-w-none text-title-dark/80 text-sm leading-8 selection:bg-blue-100 selection:text-blue-900"
+                  className="prose prose-sm max-w-none text-title-dark/90 text-sm leading-8 selection:bg-blue-100 selection:text-blue-900"
                   dangerouslySetInnerHTML={{
                     __html: activeArticle?.content ?? "",
                   }}
@@ -285,12 +293,12 @@ export default function ArticleReview({ articles }: ArticleReviewProps) {
               }}
             >
               <span className="text-xs font-semibold font-mono">
-                {selectedText.length} chars
+                {selectedText.length}
               </span>
-              <div className="h-3 w-px bg-neutral-600"></div>
+              <div className="h-3 w-px bg-neutral-400"></div>
               <button
                 onClick={handleSelectText}
-                className="text-xs font-bold text-blue-400 hover:text-blue-300 hover:underline"
+                className="text-xs font-bold text-blue-500 hover:text-blue-700 cursor-pointer"
               >
                 Select
               </button>
@@ -301,7 +309,7 @@ export default function ArticleReview({ articles }: ArticleReviewProps) {
         </section>
 
         {/* filters */}
-        <aside className="w-[300px] border-l border-neutral-200 bg-white flex flex-col shrink-0">
+        <aside className="w-[262.5px] border-l-2 border-border-dark bg-white flex flex-col shrink-0">
           <div className="flex-1 overflow-y-auto px-6 pt-6 space-y-8 scrollbar-custom">
             {FILTERS.map((group) => (
               <div key={group.name}>
@@ -319,17 +327,17 @@ export default function ArticleReview({ articles }: ArticleReviewProps) {
                     >
                       <div
                         className={`
-                          w-5 h-5 rounded border flex items-center justify-center transition-all duration-200 bg-white
+                          w-5 h-5 rounded border flex items-center justify-center transition-all duration-200
                           ${
                             checkedFilters[`${group.name}-${option}`]
-                              ? "bg-blue-600 border-blue-600 shadow-sm"
-                              : "border-neutral-300 group-hover:border-blue-400"
+                              ? "bg-checkbox-bg z-100"
+                              : "border-gray-300 group-hover:border-blue-400"
                           }
                         `}
                       >
                         {checkedFilters[`${group.name}-${option}`] && (
                           <Check
-                            className="w-3.5 h-3.5 text-blue-600"
+                            className="w-3.5 h-3.5 text-white"
                             strokeWidth={3}
                           />
                         )}
@@ -376,7 +384,13 @@ export default function ArticleReview({ articles }: ArticleReviewProps) {
               variant="outline"
               className="text-subtitle-dark flex gap-2 mx-auto w-full rounded-full cursor-pointer mt-auto"
             >
-              <StickyNote size={16} />
+              <Image
+                src="/icons/feedback.svg"
+                alt="Luna logo"
+                width={14}
+                height={14}
+                className="flex items-center p-0 m-0 "
+              />
               <span className="text-sm font-semibold">Feedback</span>
               <div className="rounded-full bg-red-600 text-[10px] text-white px-2 py-1 flex items-center justify-center leading-normal">
                 145

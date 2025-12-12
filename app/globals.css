@@ -5,23 +5,39 @@
   --foreground: #171717;
   --color-brand-green: #00930A;
   --color-title-dark: #333333;
+  --color-title-red: #B40303;
   --color-subtitle-dark: #475569;
   --color-danger: #CB0000;
   --color-success: #00930A;
-  --scrollbar-thumb-color: rgba(193, 190, 190, 0.1);
+  --scrollbar-thumb-color: #ECECEC;
+  --scrollbar-track-color: #F8FAFC;
+  --icon-dark: #94A3B8;
+  --border-dark: #E2E8F0;
+  --bg-main: #F8FAFC;
+  --checkbox-bg: #1641FE;
+  --link:#1641FE;
+  --searchbox:#DBDBDB;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  /* --font-sans: var(--font-geist-sans); */
+  --font-sans: var(--font-jakarta);
   --font-mono: var(--font-geist-mono);
 
   --color-brand-green: var(--color-brand-green);
   --color-title-dark: var(--color-title-dark);
+  --color-title-red: var(--color-title-red);
   --color-subtitle-dark: var(--color-subtitle-dark);
   --color-danger: var(--color-danger);
   --color-success: var(--color-success);
+  --color-icon-dark: var(--icon-dark);
+  --color-border-dark: var(--border-dark);
+  --color-bg-main: var(--bg-main);
+  --color-checkbox-bg: var(--checkbox-bg);
+  --color-link: var(--link);
+  --color-searchbox: var(--searchbox);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -31,10 +47,14 @@
   }
 }
 
+html{
+  font-family: var(--font-jakarta), sans-serif;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-jakarta), sans-serif;
 }
 
 .scrollbar-custom {
@@ -53,4 +73,12 @@ body {
 .scrollbar-custom::-webkit-scrollbar-thumb {
   background-color: var(--scrollbar-thumb-color);
   border-radius: 10px;
+}
+.no-select {
+  user-select: none;
+
+  /* for cross-browser compatibility */
+  -webkit-user-select: none; /* Chrome, Safari, Opera */
+  -moz-user-select: none;    /* Firefox */
+  -ms-user-select: none;     /* Internet Explorer/Edge */
 }

@@ -1,36 +1,24 @@
 "use client";
 
 import { company as Company } from "@/app/generated/prisma/client";
+import { COMPANY_TAGS_MAP } from "@/lib/data/news-data";
 import {
   ChevronDown,
-  Link as LinkIcon,
   ListCheck,
-  Loader2,
-  MoreVertical,
   Pencil,
   Plus,
-  Search,
-  Trash2,
-  UnfoldHorizontal,
-  X,
+  Search
 } from "lucide-react";
-import Link from "next/link";
+import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import CompanyDetail from "./CompanyDetail";
-import { COMPANY_TAGS_MAP } from "@/lib/data/news-data";
 
 interface CompaniesProps {
   initialCompanies: Company[];
-  initialSkip: number;
-  totalCount: number;
 }
 
-export default function Companies({
-  initialCompanies,
-  initialSkip,
-  totalCount,
-}: CompaniesProps) {
+export default function Companies({ initialCompanies }: CompaniesProps) {
   const [companies, setCompanies] = useState<Company[]>(initialCompanies);
   const [sidebarWidth, setSidebarWidth] = useState(500);
   const [isResizing, setIsResizing] = useState(false);
@@ -39,25 +27,6 @@ export default function Companies({
   const [selectedCompanyId, setSelectedCompanyId] = useState<number>(
     companies[0]?.id
   );
-  const [skip, setSkip] = useState(initialSkip);
-  const [isLoadingMoreCompanies, setIsLoadingMoreCompanies] = useState(false);
-  const hasMore = companies.length < totalCount;
-
-  const loadMoreCompanies = async () => {
-    setIsLoadingMoreCompanies(true);
-
-    try {
-      const response = await fetch(`/api/companies?skip=${skip}`);
-      const data = await response.json();
-
-      setCompanies((prevCompanies) => [...prevCompanies, ...data.companies]);
-      setSkip((prevSkip) => prevSkip + data.pageSize);
-    } catch (error) {
-      console.error("Failed to load more companies:", error);
-    } finally {
-      setIsLoadingMoreCompanies(false);
-    }
-  };
 
   const getCompanyTags = (company: Company) => {
     const tagIds = company.tags
@@ -91,6 +60,19 @@ export default function Companies({
     };
   }, [resize, stopResizing]);
 
+  // prevent text selection when resizing
+  useEffect(() => {
+    if (isResizing) {
+      document.body.classList.add("no-select");
+    } else {
+      document.body.classList.remove("no-select");
+    }
+
+    return () => {
+      document.body.classList.remove("no-select");
+    };
+  }, [isResizing]);
+
   const activeCompany =
     companies.find((c) => c.id === selectedCompanyId) || companies[0];
 
@@ -98,7 +80,7 @@ export default function Companies({
     <div className="flex h-full bg-neutral-50">
       {/* companies list sidebar */}
       <div
-        className="bg-white border-r border-neutral-200 flex flex-col shrink-0 relative"
+        className="bg-white border-r-2 border-border-dark flex flex-col shrink-0 relative"
         style={{ width: sidebarWidth, minWidth: 300, maxWidth: 600 }}
       >
         <div className="p-4 border-b border-neutral-200 space-y-4">
@@ -109,7 +91,7 @@ export default function Companies({
                 className="flex items-center gap-4 font-semibold text-subtitle-dark text-xs hover:bg-neutral-50 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
               >
                 <div className="flex items-center gap-2">
-                  <ListCheck size={16} />
+                  {/* <ListCheck size={16} /> */}
                   <span>{liststatus}</span>
                 </div>
                 <ChevronDown
@@ -146,7 +128,7 @@ export default function Companies({
                 </>
               )}
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center ">
               <Button
                 variant="ghost"
                 className="text-blue-600 text-sm hover:bg-blue-50 flex items-center gap-2 cursor-pointer"
@@ -161,11 +143,8 @@ export default function Companies({
                 size="sm"
               >
                 <Plus size={14} />
-                <span>Add task</span>
+                <span>Add lead</span>
               </Button>
-              <button className="p-1 text-neutral-400 hover:text-neutral-600 rounded cursor-pointer">
-                <MoreVertical className="w-4 h-4" />
-              </button>
             </div>
           </div>
           <div className="relative group">
@@ -176,12 +155,12 @@ export default function Companies({
             <input
               type="text"
               placeholder="Search for anything..."
-              className="pl-9 pr-4 py-1.5 min-w-70 border border-neutral-200 rounded-lg text-xs text-subtitle-dark bg-white placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-all shadow-xs"
+              className="pl-9 pr-4 py-2 min-w-70 border border-searchbox rounded-lg text-xs text-subtitle-dark bg-white placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-all"
             />
           </div>
         </div>
 
-        <div className="grid grid-cols-[40px_1fr_1fr] px-4 py-2 bg-neutral-50 text-xs font-semibold text-neutral-500 border-b border-neutral-200">
+        <div className="grid grid-cols-[40px_1fr_1fr] px-4 py-2 bg-neutral-50 text-sm font-semibold text-title-dark/90 border-b border-border-dark">
           <div>ID</div>
           <div>Company name</div>
           <div>Tags</div>
@@ -194,7 +173,7 @@ export default function Companies({
               key={company.id}
               onClick={() => setSelectedCompanyId(company.id)}
               className={`
-                grid grid-cols-[40px_1fr_1fr] px-4 py-3 border-b border-neutral-100 cursor-pointer items-center text-sm
+                grid grid-cols-[40px_1fr_1fr] px-4 py-3 border-y-[0.7px] border-border-dark cursor-pointer items-center text-sm font-medium text-title-dark/90
                 ${
                   company.id === selectedCompanyId
                     ? "bg-blue-50/50"
@@ -216,7 +195,7 @@ export default function Companies({
                 {getCompanyTags(company).map((tag, i) => (
                   <span
                     key={i}
-                    className="px-2 py-0.5 bg-neutral-100 border border-neutral-200 rounded text-xs text-neutral-600 whitespace-nowrap"
+                    className="px-2 py-0.5 bg-neutral-100 border border-neutral-200 rounded text-xs text-title-dark whitespace-nowrap"
                   >
                     {tag}
                   </span>
@@ -224,33 +203,21 @@ export default function Companies({
               </div>
             </div>
           ))}
-
-          {hasMore && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={loadMoreCompanies}
-              disabled={isLoadingMoreCompanies}
-              className="rounded-full w-full text-subtitle-dark/80 hover:text-subtitle-dark font-semibold my-4 cursor-pointer flex items-center gap-2"
-            >
-              {isLoadingMoreCompanies ? (
-                <>
-                  <Loader2 className="animate-spin" size={14} />
-                  <span>Loading...</span>
-                </>
-              ) : (
-                <span>Load More</span>
-              )}
-            </Button>
-          )}
         </div>
 
         <div
-          className="absolute -right-3 top-[108px] z-20 cursor-grab group/handle"
+          className="absolute -right-3 top-5 z-20 cursor-grab group/handle"
           onMouseDown={startResizing}
         >
           <div className="w-6 h-6 bg-white border border-neutral-200 rounded-full shadow-sm flex items-center justify-center group-hover/handle:border-blue-400 group-hover/handle:ring-2 group-hover/handle:ring-blue-100 transition-all">
-            <UnfoldHorizontal className="w-4 h-4 text-subtitle-dark/80 group-hover/handle:text-blue-500" />
+            {/* <UnfoldHorizontal className="w-4 h-4 text-subtitle-dark/80 group-hover/handle:text-blue-500" /> */}
+            <Image
+              src="/icons/resizer.svg"
+              alt="Luna logo"
+              width={14}
+              height={14}
+              className="flex items-center p-0 m-0 pointer-events-none"
+            />
           </div>
         </div>
 
