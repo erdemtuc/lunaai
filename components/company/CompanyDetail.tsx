@@ -1,10 +1,48 @@
 import { company as Company } from "@/app/generated/prisma/client";
-import { Link as LinkIcon, Pencil, Plus, Trash2, X } from "lucide-react";
+import {
+  Link as LinkIcon,
+  Loader2,
+  Pencil,
+  Plus,
+  Trash2,
+  X,
+} from "lucide-react";
 import Link from "next/link";
 import { Button } from "../ui/button";
 import Image from "next/image";
+import { useEffect, useState } from "react";
+import { CompanyNewsItem } from "@/lib/types/news-types";
+import { formatDate } from "@/lib/utils";
 
 const CompanyDetail = ({ activeCompany }: { activeCompany: Company }) => {
+  const [loadinNewses, setLoadinNewses] = useState(false);
+  const [newses, setNewses] = useState<CompanyNewsItem[]>([]);
+
+  const loadNewses = async (companyId: number) => {
+    setLoadinNewses(true);
+
+    try {
+      const response = await fetch(`/api/newses?companyId=${companyId}`);
+      const data = await response.json();
+
+      setNewses(data);
+    } catch (error) {
+      console.error("Failed to company newses:", error);
+    } finally {
+      setLoadinNewses(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeCompany?.id) {
+      loadNewses(activeCompany.id);
+    }
+  }, [activeCompany]);
+
+  useEffect(() => {
+    console.log("newses data", newses);
+  }, [newses]);
+
   return (
     <div className="flex-1 overflow-y-auto p-4 scrollbar-custom bg-bg-main">
       <div className="bg-white rounded-3xl border border-border-dark shadow-xs mb-6 space-y-2">
@@ -126,20 +164,47 @@ const CompanyDetail = ({ activeCompany }: { activeCompany: Company }) => {
               </tr>
             </thead>
             <tbody className="divide-y-[1.5px] divide-border-dark text-sm text-title-dark font-medium">
-              {Array.from({ length: 3 }).map((_, index) => (
-                <tr key={index} className="hover:bg-neutral-50">
-                  <td className="px-6 py-3">17 October, 2025</td>
-                  <td className="px-6 py-3">IronGate Partners</td>
-                  <td className="px-6 py-3">
-                    <Link
-                      href="https://www.bloombergfinance.com"
-                      className="text-blue-600 hover:underline truncate block w-96"
-                    >
-                      https://www.bloombergfinance.com
-                    </Link>
+              {loadinNewses ? (
+                <tr>
+                  <td
+                    colSpan={3}
+                    className="px-6 py-3 text-center text-neutral-400"
+                  >
+                    <div className="flex items-center justify-center gap-2">
+                      <Loader2 size={14} className="animate-spin" />
+                      <span>Loading newses...</span>
+                    </div>
                   </td>
                 </tr>
-              ))}
+              ) : newses.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={3}
+                    className="px-6 py-3 text-center text-neutral-400"
+                  >
+                    No news available
+                  </td>
+                </tr>
+              ) : (
+                newses.map((news, index) => (
+                  <tr key={index} className="hover:bg-neutral-50">
+                    <td className="px-6 py-3">
+                      {formatDate(news?.published_date ?? "Date Unknown")}
+                    </td>
+                    <td className="px-6 py-3">
+                      {news.portal ?? "Unknown Source"}
+                    </td>
+                    <td className="px-6 py-3">
+                      <Link
+                        href={news?.url ?? ""}
+                        className="text-blue-600 hover:underline truncate block w-96"
+                      >
+                        {news?.url ?? "No link available"}
+                      </Link>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

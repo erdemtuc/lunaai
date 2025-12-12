@@ -17,7 +17,7 @@ const FeedBackModal = ({ closeModal }: { closeModal: VoidFunction }) => {
       </div>
       <div className="relative max-h-12 mb-2">
         <textarea
-          placeholder="Type your notes here..."
+          placeholder="Notes..."
           className="w-full text-sm resize-none mb-4 outline-none text-neutral-700 placeholder:text-neutral-400 bg-white px-2 py-1 rounded-lg border border-transparent focus:border-blue-100 focus:bg-blue-50/30 transition-all"
           rows={2}
         />

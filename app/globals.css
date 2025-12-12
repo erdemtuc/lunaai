@@ -9,6 +9,7 @@
   --color-subtitle-dark: #475569;
   --color-danger: #CB0000;
   --color-success: #00930A;
+  --color-normal: #00930A;
   --scrollbar-thumb-color: #ECECEC;
   --scrollbar-track-color: #F8FAFC;
   --icon-dark: #94A3B8;
@@ -32,12 +33,14 @@
   --color-subtitle-dark: var(--color-subtitle-dark);
   --color-danger: var(--color-danger);
   --color-success: var(--color-success);
+  --color-normal: var(--color-success);
   --color-icon-dark: var(--icon-dark);
   --color-border-dark: var(--border-dark);
   --color-bg-main: var(--bg-main);
   --color-checkbox-bg: var(--checkbox-bg);
   --color-link: var(--link);
   --color-searchbox: var(--searchbox);
+  --font-poppins: var(--font-poppins);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -59,7 +62,7 @@ body {
 
 .scrollbar-custom {
   /* Firefox */
-  scrollbar-color: var(--scrollbar-thumb-color) var(--scrollbar-track-color);
+  scrollbar-color: var(--scrollbar-thumb-color) transparent !important;
   scrollbar-width: thin;
 }
 
@@ -68,7 +71,8 @@ body {
   width: 10px;
 }
 .scrollbar-custom::-webkit-scrollbar-track {
-  background: var(--scrollbar-track-color);
+  /* background: var(--scrollbar-track-color); */
+  background: transparent !important;
 }
 .scrollbar-custom::-webkit-scrollbar-thumb {
   background-color: var(--scrollbar-thumb-color);
@@ -81,4 +85,8 @@ body {
   -webkit-user-select: none; /* Chrome, Safari, Opera */
   -moz-user-select: none;    /* Firefox */
   -ms-user-select: none;     /* Internet Explorer/Edge */
+}
+
+.poppins {
+  font-family: var(--font-poppins), sans-serif;
 }

@@ -2,13 +2,7 @@
 
 import { company as Company } from "@/app/generated/prisma/client";
 import { COMPANY_TAGS_MAP } from "@/lib/data/news-data";
-import {
-  ChevronDown,
-  ListCheck,
-  Pencil,
-  Plus,
-  Search
-} from "lucide-react";
+import { ChevronDown, ListCheck, Pencil, Plus, Search } from "lucide-react";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import { Button } from "../ui/button";
@@ -24,8 +18,8 @@ export default function Companies({ initialCompanies }: CompaniesProps) {
   const [isResizing, setIsResizing] = useState(false);
   const [showListMenu, setShowListMenu] = useState(false);
   const [liststatus, setListstatus] = useState("Long List");
-  const [selectedCompanyId, setSelectedCompanyId] = useState<number>(
-    companies[0]?.id
+  const [selectedCompanyId, setSelectedCompanyId] = useState<number | null>(
+    companies.length ? companies[0].id : null
   );
 
   const getCompanyTags = (company: Company) => {
@@ -73,8 +67,13 @@ export default function Companies({ initialCompanies }: CompaniesProps) {
     };
   }, [isResizing]);
 
-  const activeCompany =
-    companies.find((c) => c.id === selectedCompanyId) || companies[0];
+  const activeCompany = selectedCompanyId
+    ? companies.find((c) => c.id === selectedCompanyId) || null
+    : null;
+
+  useEffect(() => {
+    console.log("companiess", companies);
+  }, []);
 
   return (
     <div className="flex h-full bg-neutral-50">
@@ -229,7 +228,7 @@ export default function Companies({ initialCompanies }: CompaniesProps) {
       </div>
 
       {/* company details panel */}
-      <CompanyDetail activeCompany={activeCompany} />
+      {activeCompany && <CompanyDetail activeCompany={activeCompany} />}
     </div>
   );
 }

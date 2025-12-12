@@ -11,6 +11,18 @@ export const FILTERS: FilterGroup[] = [
   },
 ];
 
+export const TRAINING_COLORS = [
+  "border-danger",
+  "border-success",
+  "border-normal",
+];
+
+export const TRAINING_COLORS_LIGHT = [
+  "border-danger/40",
+  "border-success/40",
+  "border-normal/40",
+];
+
 export const COMPANY_TAGS_MAP: { [key: string]: string } = {
   "1": "Big company",
   "2": "Urgent",
