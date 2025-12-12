@@ -1,13 +1,8 @@
 import { company as Company } from "@/app/generated/prisma/client";
-import {
-  Link as LinkIcon,
-  Pencil,
-  Plus,
-  Trash2,
-  X
-} from "lucide-react";
+import { Link as LinkIcon, Pencil, Plus, Trash2, X } from "lucide-react";
 import Link from "next/link";
 import { Button } from "../ui/button";
+import Image from "next/image";
 
 const CompanyDetail = ({ activeCompany }: { activeCompany: Company }) => {
   return (
@@ -23,9 +18,12 @@ const CompanyDetail = ({ activeCompany }: { activeCompany: Company }) => {
                 <span>October 17, 2025</span>
                 <span className="w-1.5 h-1.5 rounded-full bg-neutral-300"></span>
                 <div className="flex items-center gap-1.5">
-                  <img
+                  <Image
                     src="/profile-image.png"
-                    className="w-4 h-4 rounded-full"
+                    alt="Profile"
+                    width={16}
+                    height={16}
+                    className="rounded-full"
                   />
                   <span>Leslie Alexander</span>
                 </div>
@@ -164,9 +162,12 @@ const CompanyDetail = ({ activeCompany }: { activeCompany: Company }) => {
                 <tr key={index} className="hover:bg-neutral-50">
                   <td className="px-6 py-3">17 October, 2025</td>
                   <td className="px-6 py-3 flex items-center gap-2">
-                    <img
+                    <Image
                       src="/profile-image.png"
-                      className="w-4 h-4 rounded-full"
+                      alt="Profile"
+                      width={16}
+                      height={16}
+                      className="rounded-full"
                     />
                     <span>Cody Fischer</span>
                   </td>
@@ -195,9 +196,12 @@ const CompanyDetail = ({ activeCompany }: { activeCompany: Company }) => {
                 <tr key={index} className="hover:bg-neutral-50">
                   <td className="px-6 py-3">17 October, 2025</td>
                   <td className="px-6 py-3 flex items-center gap-2">
-                    <img
+                    <Image
                       src="/profile-image.png"
-                      className="w-4 h-4 rounded-full"
+                      alt="Profile"
+                      width={16}
+                      height={16}
+                      className="rounded-full"
                     />
                     <span>Leslie Alexander</span>
                   </td>
