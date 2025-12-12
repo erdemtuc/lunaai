@@ -231,7 +231,7 @@ export default function ArticleReview({
       <div className="flex-1 flex overflow-hidden">
         {/* article list */}
         <aside className="w-[250px] border-r-2 border-border-dark bg-white flex flex-col shrink-0">
-          <div className="flex-1 overflow-y-auto py-4 px-10 space-y-4 scrollbar-custom ">
+          <div className="flex-1 overflow-y-auto py-4 px-[42.5px] space-y-4 scrollbar-custom ">
             {articles.map((article, idx) => {
               const colorClass =
                 articleColors[article.id]?.normal ?? "border-normal";
@@ -244,14 +244,14 @@ export default function ArticleReview({
                   <div
                     onClick={() => setActiveArticleId(article.id)}
                     className={`
-                  py-4 px-2 rounded-xl border-3 cursor-pointer transition-all duration-200 hover:shadow-sm relative group bg-white shadow-xs
+                  py-2 px-2 rounded-2xl border-3 cursor-pointer transition-all duration-200 hover:shadow-sm relative group bg-white shadow-xs
                   ${colorClass}
                 `}
                   >
                     <h3 className="font-bold text-xs mb-2 text-neutral-900 font-poppins leading-[140%] tracking-[0]">
                       {article.header}
                     </h3>
-                    <p className="text-xs text-neutral-900 line-clamp-3 leading-relaxed font-poppins">
+                    <p className="text-xs text-neutral-900 line-clamp-8 leading-relaxed font-poppins">
                       {article.content}
                     </p>
                   </div>

@@ -154,7 +154,7 @@ export default function Companies({ initialCompanies }: CompaniesProps) {
             <input
               type="text"
               placeholder="Search for anything..."
-              className="pl-9 pr-4 py-2 min-w-70 border border-searchbox rounded-lg text-xs text-subtitle-dark bg-white placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-all"
+              className="pl-9 pr-4 py-2 w-full border border-searchbox rounded-lg text-xs text-subtitle-dark bg-white placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-all"
             />
           </div>
         </div>
