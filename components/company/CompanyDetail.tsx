@@ -172,7 +172,7 @@ const CompanyDetail = ({ activeCompany }: { activeCompany: Company }) => {
                   >
                     <div className="flex items-center justify-center gap-2">
                       <Loader2 size={14} className="animate-spin" />
-                      <span>Loading newses...</span>
+                      <span>Loading news...</span>
                     </div>
                   </td>
                 </tr>
