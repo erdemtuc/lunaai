@@ -217,6 +217,7 @@ export default function Companies({ initialCompanies }: CompaniesProps) {
               width={14}
               height={14}
               className="flex items-center p-0 m-0 pointer-events-none"
+              priority
             />
           </div>
         </div>
