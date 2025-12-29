@@ -126,6 +126,10 @@ export default function ArticleReview({
   }, [leftWidth, rightWidth]);
 
   useEffect(() => {
+    setNotes(feedbacks ?? []);
+  }, [feedbacks]);
+
+  useEffect(() => {
     const handleSelection = () => {
       const selection = window.getSelection();
 
@@ -192,13 +196,13 @@ export default function ArticleReview({
     if (!selectedRange) return;
 
     const span = document.createElement("span");
-    span.style.backgroundColor = "#BFDBFE"; 
+    span.style.backgroundColor = "#BFDBFE";
     span.style.padding = "2px";
-    span.className = "selected-highlight"; 
+    span.className = "selected-highlight";
 
-    selectedRange.surroundContents(span); 
-    window.getSelection()?.removeAllRanges(); 
-    setSelectionRect(null); 
+    selectedRange.surroundContents(span);
+    window.getSelection()?.removeAllRanges();
+    setSelectionRect(null);
     setAllowNext(true);
   };
 
@@ -920,7 +924,7 @@ export default function ArticleReview({
             pageType={trainingPageType}
             newsId={activeArticleId}
             onAddFeedback={(content) => {
-              setNotes((prev) => [...prev,content]);
+              setNotes((prev) => [...prev, content]);
             }}
           />
         )}
