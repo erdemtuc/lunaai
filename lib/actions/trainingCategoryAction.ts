@@ -35,4 +35,14 @@ export async function applyTrainingFilters(
       },
     });
   }
+  else{
+    return prisma.news_training.create({
+      data: {
+        news_id:newsId,
+        user_id:userId,
+        category: categoryValue,
+        time_stamp: new Date(),
+      },
+    });
+  }
 }

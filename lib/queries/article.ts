@@ -43,6 +43,7 @@ export async function getArticles(
     where: {
       id: { in: ids },
     },
+    orderBy:{id:"desc"}
   });
 
   return news;
@@ -140,4 +141,28 @@ export async function getFeedbacks(newsId: number) {
   });
 
   return rows.map((r) => r.feedback as string);
+}
+
+export async function getNextCenterNews() {
+  const session = await getServerSession(authOptions);
+  if (!session) throw new Error("Unauthorized");
+
+  const userId = session.user.id;
+
+  const nextNews = await prisma.news.findFirst({
+    where: {
+      NOT: {
+        news_training: {
+          some: { user_id: userId },
+        },
+      },
+    },
+    orderBy: { id: "asc" },
+    include: {
+      company_news: { include: { company: true } },
+      news_source: true,
+    },
+  });
+
+  return nextNews ?? null;
 }

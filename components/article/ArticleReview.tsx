@@ -6,7 +6,7 @@ import {
   TRAINING_COLORS,
   TRAINING_COLORS_LIGHT,
 } from "@/lib/data/news-data";
-import { ArticlesArrayType } from "@/lib/types/news-types";
+import { ArticlesArrayType, ArticleType } from "@/lib/types/news-types";
 import { formatDate } from "@/lib/utils";
 import {
   Check,
@@ -29,6 +29,7 @@ import { toast } from "sonner";
 import { insertCleaningFeedback } from "@/lib/actions/cleaningFeedbackAction";
 import { applyTrainingFilters } from "@/lib/actions/trainingCategoryAction";
 import Link from "next/link";
+import { fetchNextCenterNews } from "@/lib/queries/client-queries/newsClient";
 
 interface ArticleReviewProps {
   articles: ArticlesArrayType;
@@ -60,8 +61,9 @@ export default function ArticleReview({
   // const [activeArticleId, setActiveArticleId] = useState<number>(
   //   articles[0]?.id
   // );
-  const activeArticleId =
-    Number(searchParams.get("activeNews")) || articles[0]?.id;
+  // const activeArticleId =
+  //   Number(searchParams.get("activeNews")) || articles[0]?.id;
+
   const [selectionRect, setSelectionRect] = useState<DOMRect | null>(null);
   const [selectedText, setSelectedText] = useState<string>("");
   const [selectedWordCount, setSelectedWordCount] = useState<number>();
@@ -80,7 +82,14 @@ export default function ArticleReview({
   >(initialType);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [notes, setNotes] = useState<string[]>(feedbacks ?? []);
-  const [addingCleaningFeedback, setAddingCleaningFeedback] = useState(false);
+  // const [addingCleaningFeedback, setAddingCleaningFeedback] = useState(false);
+  const [addingFeedbackStates, setAddingFeedbackStates] = useState<
+    Record<"dislike" | "notsure" | "like", boolean>
+  >({
+    dislike: false,
+    notsure: false,
+    like: false,
+  });
   const [applyingFilters, setApplyingFilters] = useState(false);
   const [articleColors, setArticleColors] = useState<
     Record<number, { normal: string | null; light: string | null }>
@@ -99,13 +108,18 @@ export default function ArticleReview({
   const articleListRefs = useRef<Map<number, HTMLDivElement>>(new Map());
   const filtersScrollContainerRef = useRef<HTMLDivElement>(null);
 
-  const activeArticle =
-    articles.find((a) => a.id === activeArticleId) || articles[0];
+  // const centerArticle =
+  //   articles.find((a) => a.id === activeArticleId) || articles[0];
+  const [articlesList, setArticlesList] = useState<ArticlesArrayType>(articles);
+  const [centerArticle, setCenterArticle] = useState<ArticleType | null>(null);
+  // const [centerArticleId, setCenterArticleId] = useState<number>(null);
+  const [loadingNextCenterNews, setLoadingNextCenterNews] = useState(false);
+
   const contentRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const formattedActiveArticleContent =
-    activeArticle?.content?.replace(/\\n/g, "\n") ?? "";
+    centerArticle?.content?.replace(/\\n/g, "\n") ?? "";
 
   useEffect(() => {
     const currentType = searchParams.get("type") ?? "cleanining";
@@ -130,6 +144,27 @@ export default function ArticleReview({
   }, [feedbacks]);
 
   useEffect(() => {
+    setArticlesList(articles);
+  }, [articles]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoadingNextCenterNews(true);
+      try {
+        const nextNews = await fetchNextCenterNews();
+        console.log("nexxxxxxx", nextNews);
+        setCenterArticle(nextNews);
+      } catch (error) {
+        console.error("Fetch error:", error);
+      } finally {
+        setLoadingNextCenterNews(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
     const handleSelection = () => {
       const selection = window.getSelection();
 
@@ -143,12 +178,11 @@ export default function ArticleReview({
         setSelectedText("");
         return;
       }
-
-      if (
-        typeof activeArticle?.content === "string" &&
-        activeArticle.content.length < 550
-      ) {
+      const cleanedContent =
+        centerArticle?.content?.replace(/<[^>]+>/g, "") ?? "";
+      if (cleanedContent.length < 550) {
         setSelectionRect(null);
+        return;
       }
 
       const range = selection.getRangeAt(0);
@@ -189,7 +223,7 @@ export default function ArticleReview({
         scrollContainer.removeEventListener("scroll", handleScroll);
       }
     };
-  }, [selectionRect]);
+  }, [selectionRect, centerArticle]);
 
   // persist the selection to local state by highlighting
   const handleSelectText = () => {
@@ -324,7 +358,7 @@ export default function ArticleReview({
   const handleCleaningFeedback = async (
     feedbackType: "like" | "dislike" | "notsure"
   ) => {
-    setAddingCleaningFeedback(true);
+    setAddingFeedbackStates((prev) => ({ ...prev, [feedbackType]: true }));
 
     const feedbackMap: Record<typeof feedbackType, number> = {
       dislike: 1,
@@ -336,30 +370,43 @@ export default function ArticleReview({
 
     setArticleColors((prev) => ({
       ...prev,
-      [activeArticleId]: feedbackColorMap[feedbackType],
+      [centerArticle?.id as number]: feedbackColorMap[feedbackType],
     }));
     try {
-      await insertCleaningFeedback(feedbackNumber, activeArticleId);
+      await insertCleaningFeedback(feedbackNumber, centerArticle?.id as number);
       // toast.success("Feedback added successfully", { richColors: true });
+      // setArticlesList(prev => [...prev, centerArticle]);
       shiftNextNews();
     } catch (err) {
       toast.error("Failed to add feedback", { richColors: true });
       console.log("errrrrr", err);
     } finally {
-      setAddingCleaningFeedback(false);
+      setAddingFeedbackStates((prev) => ({ ...prev, [feedbackType]: false }));
     }
   };
 
-  const shiftNextNews = () => {
-    if (!articles || articles.length === 0) return;
-
-    const currentIndex = articles.findIndex((a) => a.id === activeArticleId);
-    const nextIndex = (currentIndex + 1) % articles.length;
-    handleSetActiveNews(articles[nextIndex].id);
+  const shiftNextNews = async () => {
+    setLoadingNextCenterNews(true);
+    try {
+      const nextNews = await fetchNextCenterNews();
+      if (!nextNews) {
+        return;
+      }
+      setCenterArticle(nextNews);
+      handleSetActiveNews(nextNews.id);
+      scrollFiltersToTop();
+      scrollContentsToTop();
+    } catch (error) {
+      console.log("center news error", error);
+    } finally {
+      setLoadingNextCenterNews(false);
+    }
   };
 
   const handleApplyFilters = async () => {
-    if (!selectedRange || !allowNext) {
+    const cleanedContent =
+      centerArticle?.content?.replace(/<[^>]+>/g, "") ?? "";
+    if ((!selectedRange || !allowNext) && cleanedContent.length > 550) {
       toast.info("Please make text selection from the news", {
         richColors: true,
       });
@@ -372,7 +419,7 @@ export default function ArticleReview({
       .filter(Boolean);
 
     try {
-      await applyTrainingFilters(filterIds, activeArticleId);
+      await applyTrainingFilters(filterIds, centerArticle?.id as number);
       shiftNextNews();
       // toast.success("Filters applied successfully", { richColors: true });
       setCheckedFilters({});
@@ -389,34 +436,60 @@ export default function ArticleReview({
     }
   };
 
-  useEffect(() => {
-    if (trainingPageType !== "classifying") return;
+  const scrollFiltersToTop = () => {
+    if (!filtersScrollContainerRef.current) return;
 
-    const categoryString = activeArticle?.news_training[0]?.category ?? "";
-
-    if (!categoryString) {
-      setCheckedFilters({});
-      return;
-    }
-
-    const hydrated: Record<string, boolean> = {};
-
-    categoryString.split(",").forEach((id) => {
-      const cleanId = id.trim();
-      if (cleanId) hydrated[`Category-${cleanId}`] = true;
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        filtersScrollContainerRef.current?.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+      });
     });
+  };
 
-    setCheckedFilters(hydrated);
-    console.log("hydrrr checkkk", categories, industries);
-    console.log("hydrrr", hydrated);
-  }, [activeArticle, trainingPageType]);
+  const scrollContentsToTop = () => {
+    if (!scrollContainerRef.current) return;
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        scrollContainerRef.current?.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+      });
+    });
+  };
+
+  // useEffect(() => {
+  //   if (trainingPageType !== "classifying") return;
+
+  //   const categoryString = centerArticle?.news_training[0]?.category ?? "";
+
+  //   if (!categoryString) {
+  //     setCheckedFilters({});
+  //     return;
+  //   }
+
+  //   const hydrated: Record<string, boolean> = {};
+
+  //   categoryString.split(",").forEach((id) => {
+  //     const cleanId = id.trim();
+  //     if (cleanId) hydrated[`Category-${cleanId}`] = true;
+  //   });
+
+  //   setCheckedFilters(hydrated);
+  //   console.log("hydrrr checkkk", categories, industries);
+  //   console.log("hydrrr", hydrated);
+  // }, [centerArticle, trainingPageType]);
 
   useEffect(() => {
-    const element = articleListRefs.current.get(activeArticleId);
+    const element = articleListRefs.current.get(centerArticle?.id as number);
     if (element) {
       element.scrollIntoView({ behavior: "smooth", block: "start" });
     }
-  }, [activeArticleId]);
+  }, [centerArticle?.id as number]);
 
   useEffect(() => {
     if (!articles || articles.length === 0) return;
@@ -512,7 +585,7 @@ export default function ArticleReview({
               {/* <Globe size={14} className="text-subtitle-dark/80" /> */}
               <Link
                 target="#"
-                href={activeArticle.url ?? ""}
+                href={centerArticle?.url ?? ""}
                 className="text-xs text-subtitle-dark font-semibold"
               >
                 Go web
@@ -571,8 +644,8 @@ export default function ArticleReview({
           }}
         >
           <div className="flex-1 overflow-y-auto py-4  space-y-4 scrollbar-custom ">
-            {articles && articles.length > 0 ? (
-              articles.map((article, idx) => {
+            {articlesList && articlesList.length > 0 ? (
+              articlesList.map((article, idx) => {
                 const colorClass = articleColors[article.id]?.normal ?? "";
 
                 console.log("left color", colorClass);
@@ -639,39 +712,37 @@ export default function ArticleReview({
         </aside>
 
         {/* article content */}
-        {activeArticle ? (
+        {centerArticle ? (
           <section
             ref={scrollContainerRef}
             className="flex-1 bg-bg-main overflow-y-auto relative flex justify-center scroll-smooth scrollbar-custom"
           >
             <div
-              className={`my-6 rounded-3xl border-6 shadow-sm h-fit w-[93%] ${
-                articleColors[activeArticleId]?.light ?? ""
-              }`}
+              className={`my-6 rounded-3xl border-6 shadow-sm h-fit w-[93%] `}
             >
               <div
-                className={`bg-white min-h-full p-12 shadow-sm relative border-x rounded-[18px] border ${articleColors[activeArticleId]?.normal}`}
+                className={`bg-white min-h-full p-12 shadow-sm relative border-x rounded-[18px] border`}
               >
                 <div className="text-title-red font-bold text-sm tracking-wider uppercase px-2 py-1 mb-2 rounded w-fit ml-auto">
-                  {activeArticle.company_news[0]?.company?.name ||
+                  {centerArticle.company_news[0]?.company?.name ||
                     "Unknown Company"}
                 </div>
 
                 <div className="mb-6 mt-2">
                   <h1 className="text-xl font-bold text-title-dark mb-4 leading-tight">
-                    {activeArticle.header}
+                    {centerArticle.header}
                   </h1>
                   <div className="flex items-center flex-wrap gap-x-2 gap-y-2 text-sm text-neutral-500">
                     <span className="font-bold text-subtitle-dark text-sm">
-                      {activeArticle.news_source?.name ?? "Unknown Source"}
+                      {centerArticle.news_source?.name ?? "Unknown Source"}
                     </span>
                     {/* <span className="w-1.5 h-1.5 rounded-full bg-neutral-300"></span>
                     <span className="text-subtitle-dark font-medium text-sm">
-                      {activeArticle.author || "Unknown author"}
+                      {centerArticle.author || "Unknown author"}
                     </span> */}
                     <span className="w-1.5 h-1.5 rounded-full bg-neutral-300 "></span>
                     <span className="text-subtitle-dark font-medium text-sm">
-                      {formatDate(activeArticle.published_date)}
+                      {formatDate(centerArticle.published_date)}
                     </span>
                   </div>
                 </div>
@@ -709,6 +780,10 @@ export default function ArticleReview({
               </div>
             )}
           </section>
+        ) : loadingNextCenterNews ? (
+          <div className="flex-1 bg-bg-main overflow-y-auto relative flex justify-center scroll-smooth scrollbar-custom items-center text-subtitle-dark">
+            <Loader2 className="animate-spin size-5" />
+          </div>
         ) : (
           <div className="flex-1 bg-bg-main overflow-y-auto relative flex justify-center scroll-smooth scrollbar-custom items-center text-subtitle-dark">
             No news selected
@@ -922,7 +997,7 @@ export default function ArticleReview({
           <FeedBackModal
             closeModal={() => setShowFeedbackModal(false)}
             pageType={trainingPageType}
-            newsId={activeArticleId}
+            newsId={centerArticle?.id as number}
             onAddFeedback={(content) => {
               setNotes((prev) => [...prev, content]);
             }}
@@ -938,13 +1013,13 @@ export default function ArticleReview({
         statuses={statuses}
         origins={origins}
         tags={tags}
-        activeNewsUrl={activeArticle?.url ?? ""}
+        activeNewsUrl={centerArticle?.url ?? ""}
       />
 
       {/* cleaning feedback modal */}
       {trainingPageType === "cleaning" && (
         <CleaningFeedBackModal
-          isAddingFeedback={addingCleaningFeedback}
+          addingFeedbackStates={addingFeedbackStates}
           onlike={() => handleCleaningFeedback("like")}
           onDislike={() => handleCleaningFeedback("dislike")}
           onNotSure={() => handleCleaningFeedback("notsure")}
