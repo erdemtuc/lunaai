@@ -117,6 +117,7 @@ export default function ArticleReview({
 
   const contentRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const articlesScrollContainerRef = useRef<HTMLDivElement>(null);
 
   const formattedActiveArticleContent =
     centerArticle?.content?.replace(/\\n/g, "\n") ?? "";
@@ -396,6 +397,7 @@ export default function ArticleReview({
       handleSetActiveNews(nextNews.id);
       scrollFiltersToTop();
       scrollContentsToTop();
+      scrollNewsListToTop();
     } catch (error) {
       console.log("center news error", error);
     } finally {
@@ -455,6 +457,19 @@ export default function ArticleReview({
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         scrollContainerRef.current?.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+      });
+    });
+  };
+
+  const scrollNewsListToTop = () => {
+    if (!articlesScrollContainerRef.current) return;
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        articlesScrollContainerRef.current?.scrollTo({
           top: 0,
           behavior: "smooth",
         });
@@ -643,7 +658,7 @@ export default function ArticleReview({
             // maxWidth: 400,
           }}
         >
-          <div className="flex-1 overflow-y-auto py-4  space-y-4 scrollbar-custom ">
+          <div className="flex-1 overflow-y-auto py-4  space-y-4 scrollbar-custom " ref={articlesScrollContainerRef}>
             {articlesList && articlesList.length > 0 ? (
               articlesList.map((article, idx) => {
                 const colorClass = articleColors[article.id]?.normal ?? "";
