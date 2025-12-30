@@ -16,7 +16,7 @@ export async function getArticles(
 
   const trainedNewsIds = await prisma.news_training.findMany({
     select: { news_id: true },
-    where: { news_id: { not: null } },
+    where: { news_id: { not: null }, user_id:userId },
   });
 
   const ids = trainedNewsIds.map((n) => n.news_id!);

@@ -95,10 +95,10 @@ export default function ArticleReview({
     Record<number, { normal: string | null; light: string | null }>
   >({});
   const [leftSidebarWidth, setLeftSidebarWidth] = useState<number>(
-    Number(leftWidth.value ?? "20")
+    Number(leftWidth?.value ?? "20")
   );
   const [rightSidebarWidth, setRightSidebarWidth] = useState<number>(
-    Number(rightWidth.value ?? "20")
+    Number(rightWidth?.value ?? "20")
   );
   const [isResizingRight, setIsResizingRight] = useState(false);
   const [isResizingLeft, setIsResizingLeft] = useState(false);
@@ -133,11 +133,11 @@ export default function ArticleReview({
   }, [trainingPageType, router, pathname, searchParams]);
 
   useEffect(() => {
-    setLeftSidebarWidth(Number(leftWidth.value ?? "20"));
-    setRightSidebarWidth(Number(rightWidth.value ?? "20"));
+    setLeftSidebarWidth(Number(leftWidth?.value ?? "20"));
+    setRightSidebarWidth(Number(rightWidth?.value ?? "20"));
 
-    leftWidthRef.current = Number(leftWidth.value ?? "20");
-    rightWidthRef.current = Number(rightWidth.value ?? "20");
+    leftWidthRef.current = Number(leftWidth?.value ?? "20");
+    rightWidthRef.current = Number(rightWidth?.value ?? "20");
   }, [leftWidth, rightWidth]);
 
   useEffect(() => {
