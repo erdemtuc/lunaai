@@ -691,7 +691,7 @@ export default function ArticleReview({
                       </p>
                     </div>
                     <div className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-medium text-neutral-900">
-                      {idx + 1}
+                      {article?.id}
                     </div>
                   </div>
                 );
